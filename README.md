@@ -1,6 +1,6 @@
 # Text Wizard
 **Author:** Jessen Forbush  
-**Technologies:** C++23, CMake, OpenGL, GLFW
+**Technologies:** C++23, Make, OpenGL, GLFW
 **Methodologies and Design:** File I/O Library, Compression Libraries, Regular Expression Library.
 
 
