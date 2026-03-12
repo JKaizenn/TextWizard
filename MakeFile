@@ -1,7 +1,27 @@
 CXX = g++
-CXXFLAGS = -I/include - std=c++23
-SRCS = $(wildcard src/*.cpp)
-LIBS = -framework OpenGL -framework GLUT
+CC = gcc
+CXXFLAGS = -Iinclude -std=c++23
+CFLAGS = -Iinclude
 
-main: $(SRCS)
-	$(CXX) $(CXXFLAGS) $(SRCS) -o bin/main
+SRCS = $(wildcard src/*.cpp)
+OBJS = $(SRCS:src/%.cpp=bin/%.o)
+GLAD_OBJ = bin/glad.o
+
+LIBS = -Llib \
+       -lglfw3 \
+       -framework OpenGL \
+       -framework Cocoa \
+       -framework IOKit \
+       -framework CoreVideo
+
+bin/main: $(OBJS) $(GLAD_OBJ)
+	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
+
+bin/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+bin/glad.o: src/glad.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f bin/*.o bin/main

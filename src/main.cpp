@@ -1,4 +1,5 @@
 #include <iostream>
+#include <glfw3.h>
 
 /***********************
  * PROGRAM SPECIFICATION AND DESCRIPTION:
@@ -14,6 +15,7 @@
  * 
  * C++ 23, CMAKE, OPENGL, GLFW
 *************************/
+
 
 
 
