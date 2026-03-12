@@ -1,5 +1,6 @@
 #include <iostream>
-#include <glfw3.h>
+#include <glad/glad.h>
+#include<GLFW/glfw3.h>
 
 /***********************
  * PROGRAM SPECIFICATION AND DESCRIPTION:
@@ -16,12 +17,38 @@
  * C++ 23, CMAKE, OPENGL, GLFW
 *************************/
 
-
-
-
-int main()
+int main() 
 {
-    std::cout << "Hello Text Wiz!" << '\n';
+    // Initialize GLFW with glfwInit()
+    if (!glfwInit())
+    {
+        // Handle Initialization failure
+    }
 
-    return 0;
+    // Set window hints (OpenGL version 4.1, Core profile)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+    // Create a GLFWwindow* with glfwCreateWindow()
+    GLFWwindow* window = glfwCreateWindow(640, 480, "TextWizard", NULL, NULL);
+
+    // Make the window the current context with glfwMakeContextCurrent()
+    glfwMakeContextCurrent(window);
+
+    // Initialize GLAD with gladLoadGLLoader()
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+    // Main render loop - run while !glfwWindowShouldClose()
+    while(!glfwWindowShouldClose(window))
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    } 
+
+    // Cleanup - glfwDestroyWindow() and glfwTerminate()
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
