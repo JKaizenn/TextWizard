@@ -1,0 +1,7 @@
+CXX = g++
+CXXFLAGS = -I/include - std=c++23
+SRCS = $(wildcard src/*.cpp)
+LIBS = -framework OpenGL -framework GLUT
+
+main: $(SRCS)
+	$(CXX) $(CXXFLAGS) $(SRCS) -o bin/main
