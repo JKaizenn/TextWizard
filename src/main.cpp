@@ -1,6 +1,6 @@
 #include <iostream>
 #include <glad/glad.h>
-#include<GLFW/glfw3.h>
+#include <GLFW/glfw3.h>
 
 /***********************
  * PROGRAM SPECIFICATION AND DESCRIPTION:
@@ -16,6 +16,9 @@
  * 
  * C++ 23, CMAKE, OPENGL, GLFW
 *************************/
+
+
+
 
 int main() 
 {
@@ -40,12 +43,82 @@ int main()
     // Initialize GLAD with gladLoadGLLoader()
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
+    // -------------------------------------------------------
+    // VERTEX SHADER
+
+    // Store our vertex shader in a const C string
+    const char *vertexShaderSource = "#version 330 core\n"
+        "layout(location = 0) in vec3 aPos;\n"
+        "void main()\n"
+        "{\n"
+        " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "}\0";
+
+    // Create Vertex Shader and assign it an ID
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+    /* Attach the shader source code to the shader object and compile the shader
+        Order of arguments: takes the shader object to compile to, 
+        Specifies how many strings we're passing as source code,
+        The actual source code of the vertex shader, NULL 
+    */
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+
+    // Check for successful compilation
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+
+    if(!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+    // -------------------------------------------------------
+    // FRAGMENT SHADER
+
+
+
+
+
+
+
+    // -------------------------------------------------------
+    
+    // Triangle Vertices
+    float vertices[]
+    {
+       -0.5f, -0.5f, -0.0f,
+        0.5f, -0.5f,  0.0f,
+        0.0f,  0.5f,  0.0f
+    };
+
+    // Assign a unique ID to the vertex buffer object
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    // Assign our VBO to a buffer type (ARRAY_BUFFER)
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    /* Call glBufferData to copy our vertex data into the buffer's memory
+        Order of arguments: Type of Buffer, Specifies size of data in bytes,
+        actual data we want to send, specifies how we want the GPU to manage
+        the given data
+    */   
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
     // Main render loop - run while !glfwWindowShouldClose()
     while(!glfwWindowShouldClose(window))
     {
+        glClearColor(2.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(window);
         glfwPollEvents();
+        
     } 
 
     // Cleanup - glfwDestroyWindow() and glfwTerminate()
