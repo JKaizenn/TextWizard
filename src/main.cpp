@@ -37,16 +37,33 @@ int main()
     // Initialize GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-    // Vertices and indices
-    float vertices[] = {
-        0.5f,  0.5f, 0.0f,   // top right
-        0.5f, -0.5f, 0.0f,   // bottom right
-       -0.5f, -0.5f, 0.0f,   // bottom left
-       -0.5f,  0.5f, 0.0f    // top left 
+    // // Vertices and indices
+    // float vertices[] = {
+
+    //     0.5f,  0.5f, 0.0f,   // top right
+    //     0.5f, -0.5f, 0.0f,   // bottom right
+    //    -0.5f, -0.5f, 0.0f,   // bottom left
+    //    -0.5f,  0.5f, 0.0f    // top left 
+    // };
+    // unsigned int indices[] = {
+    //     0, 1, 3,  // first triangle
+    //     1, 2, 3   // second triangle
+    // };
+
+    float triangle1[] = 
+    {
+        // Triangle 1
+        -0.25f, -0.25f, 0.0f, // Bottom Left
+        0.0f, 0.25f, 0.0f,    // Top 
+        0.25f, -0.25f, 0.0f,  // Bottom Right
     };
-    unsigned int indices[] = {
-        0, 1, 3,  // first triangle
-        1, 2, 3   // second triangle
+
+    float triangle2[] =
+    {
+        // Triangle 2
+        0.25f, -0.25f, 0.0f, // Bottom Left
+        0.50f, 0.25f, 0.0f,  // Top
+        0.75f, -0.25f, 0.0f // Bottom Right
     };
 
     // -------------------------------------------------------
@@ -106,28 +123,40 @@ int main()
     // -------------------------------------------------------
     // VAO -> VBO -> EBO -> Vertex Attributes
 
-    unsigned int VAO, VBO, EBO;
+    unsigned int VAO1, VBO1, VAO2, VBO2, EBO;
 
-    // 1. Generate and bind VAO first
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    // 2. Generate, bind, and fill VBO
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // 3. Generate, bind, and fill EBO
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // 4. Set vertex attribute pointers
+    // VAO1 Setup
+    glGenVertexArrays(1, &VAO1);
+    glBindVertexArray(VAO1);
+    glGenBuffers(1, &VBO1);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle1), triangle1, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
+    glGenVertexArrays(1, &VAO2);
+    glBindVertexArray(VAO2);
+
+    // 2. Generate, bind, and fill VBO
+    glGenBuffers(1, &VBO2);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle2), triangle2, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
+    // 3. Generate, bind, and fill EBO
+    // glGenBuffers(1, &EBO);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // 4. Set vertex attribute pointers
+
+
 
     // Unbind VAO
-    glBindVertexArray(0);
+
 
     // -------------------------------------------------------
     // Render loop
@@ -138,9 +167,16 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(VAO1);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(VAO2);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
+
+ 
 
         glfwSwapBuffers(window);
         glfwPollEvents();
