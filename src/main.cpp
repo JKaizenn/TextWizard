@@ -66,23 +66,33 @@ int main()
         0.75f, -0.25f, 0.0f // Bottom Right
     };
 
+    float triangle3[] = 
+    {
+        // Triangle 3
+        0.0f, 0.25f, 0.0f,   // Bottom Left
+        0.25f, 0.75f, 0.0f,  // Top
+        0.50f, 0.25f, 0.0f   // Bottom Right
+    };
+
     // -------------------------------------------------------
     // SHADERS
 
     const char *vertexShaderSource = "#version 330 core\n"
         "layout(location = 0) in vec3 aPos;\n"
+        "out vec4 vertexColor;\n"
         "void main()\n"
         "{\n"
-        " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "gl_Position = vec4(aPos,1.0);\n"
+        "vertexColor = vec4 (0.5, 0.0, 0.0, 1.0);\n"
         "}\0";
 
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "in vec4 vertexColor;\n"
         "void main()\n"
         "{\n"
-        " FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "FragColor = vertexColor;\n"
         "}\0";
-
 
     const char *fragmentShaderSource2 = "#version 330 core\n"
         "out vec4 FragColor;\n"
@@ -160,7 +170,7 @@ int main()
     // -------------------------------------------------------
     // VAO -> VBO -> EBO -> Vertex Attributes
 
-    unsigned int VAO1, VBO1, VAO2, VBO2, EBO;
+    unsigned int VAO1, VBO1, VAO2, VBO2, VAO3, VBO3, EBO;
 
     // VAO1 Setup
     glGenVertexArrays(1, &VAO1);
@@ -183,6 +193,16 @@ int main()
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
+
+    glGenVertexArrays(1, &VAO3);
+    glBindVertexArray(VAO3);
+    glGenBuffers(1, &VBO3);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO3);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle3), triangle3, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
     // 3. Generate, bind, and fill EBO
     // glGenBuffers(1, &EBO);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -198,6 +218,11 @@ int main()
     // -------------------------------------------------------
     // Render loop
 
+    // Check our max allowed vertex attributes
+    int nrAttributes;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+    std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.53f, 0.812f, 0.941f, 1.0f);
@@ -210,9 +235,15 @@ int main()
         glBindVertexArray(VAO1);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUseProgram(shaderProgram2);
+        glUseProgram(shaderProgram);
         glBindVertexArray(VAO2);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO3);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         glBindVertexArray(0);
 
  
@@ -224,4 +255,5 @@ int main()
     // Cleanup 
     glfwDestroyWindow(window);
     glfwTerminate();
+
 }
