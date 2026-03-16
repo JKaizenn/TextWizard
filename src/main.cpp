@@ -71,6 +71,7 @@ int main()
 
     Shader shader("shaders/vertex/vertex.glsl", "shaders/fragment/fragment.glsl");
 
+
     // -------------------------------------------------------
     // VAO -> VBO -> Vertex Attributes
 
@@ -133,6 +134,8 @@ int main()
 
         // Activate shader
         shader.use();
+
+        shader.setFloat("offset",0.5f);
 
         // Draw
         glBindVertexArray(VAO1);
