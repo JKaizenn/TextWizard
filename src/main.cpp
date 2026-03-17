@@ -7,19 +7,6 @@
 
 #include <iostream>
 
-/***********************
- * PROGRAM SPECIFICATION AND DESCRIPTION:
- * A user can create, edit, save, and open text files using the text editor, 
- * a straightforward program. In addition to a user interface for the user to interact with, 
- * it uses classes and objects to store and alter the content. 
- * Basic text editing functions including 
- * copying, pasting, deleting, searching, and printing text are all available in the text editor. 
- * Text Editor is a simple application that is built into C++ programming language. 
- * We can use Graphical User Interface (GUI) Libraries such as QT, and GTK+ for creating a graphical user interface. 
- * Libraries such as Pango or Cairo are required to display text on the screen.
- * 
- * C++ 23, CMAKE, OPENGL, GLFW
-*************************/
 
 int main() 
 {
@@ -42,7 +29,7 @@ int main()
     // Initialize GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-    float triangle1[] = {
+    float vertices[] = {
         // positions          // colors           // texture coords
         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,    // top right
         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // bottom right
@@ -50,86 +37,10 @@ int main()
         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
 
-    float triangle2[] =
-    {
-        // Triangle 2
-        0.25f, -0.25f, 0.0f,  1.0f, 0.0f, 0.0f, // Bottom right
-        0.50f, 0.25f, 0.0f,   0.0f, 1.0f, 0.0f, // Bottom Left// Top
-        0.75f, -0.25f, 0.0f,   0.0f, 0.0f, 1.0f, // Top// Bottom Right
-    };
-
-    float triangle3[] = 
-    {
-        // Triangle 3
-        0.0f, 0.25f, 0.0f,    1.0f, 0.0f, 0.0f,// Bottom Left
-        0.25f, 0.75f, 0.0f,  0.0f, 1.0f, 0.0f,
-        0.50f, 0.25f, 0.0f,   0.0f, 0.0f, 1.0f, // Top// Bottom Right
-    };
-
     unsigned int indices[] = {  
     0, 1, 3, // first triangle
     1, 2, 3  // second triangle
     };
-
-
-
-    // -------------------------------------------------------
-    // TEXTURES
-
-    // float texCoords[]
-    // {
-    //     0.0f, 0.0f, // lower-left corner
-    //     1.0f, 0.0f, // lower-right corner
-    //     0.5f, 1.0f  // top-center corner
-    // };
-
-
-    // // Arguments: Texture Target, Texture Axis Option, Texture Wrapping Mode
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-
-
-    // // For using the GL_CLAMP_TO_BORDER
-    // float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-    // glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-
-    // // Texture Filtering with GL_NEAREST and GL_LINEAR
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // // Set Filtering Method
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
-    // // Load an image using stb_image.h
-    // int width, height, nrChannels;
-
-    // // Arguments: Location of an Image File, width, height, number of color channels, 
-    // unsigned char *data = stbi_load("data/textures/container.jpg", &width, &height, &nrChannels, 0);
-
-
-    // // Generating a texture
-    // unsigned int texture;
-    // glGenTextures(1, &texture);
-
-
-    // // Bind Texture
-    // glBindTexture(GL_TEXTURE_2D, texture);
-
-    // // Generate a texture using the previously loaded image data
-
-    // /* Arguments: Texture Target, mipmap level, 
-    // format of the texture (rgb), width and height of resulting texture, 
-    // legacy stuff keep as 0, format and 
-    // datatype of the source image, the actual image data  */
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    // glGenerateMipmap(GL_TEXTURE_2D);
-
-
-    // // Free image memory
-    // stbi_image_free(data);
 
 
 
@@ -201,7 +112,7 @@ int main()
     glBindVertexArray(VAO1);
     glGenBuffers(1, &VBO1);
     glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle1), triangle1, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
@@ -214,33 +125,6 @@ int main()
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    glBindVertexArray(0);
-
-
-    // VAO 2
-    glGenVertexArrays(1, &VAO2);
-    glBindVertexArray(VAO2);
-
-    // 2. Generate, bind, and fill VBO
-    glGenBuffers(1, &VBO2);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle2), triangle2, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
-
-
-    glGenVertexArrays(1, &VAO3);
-    glBindVertexArray(VAO3);
-    glGenBuffers(1, &VBO3);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO3);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle3), triangle3, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
 
@@ -263,13 +147,7 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Activate shader
-        // shader.use();
-
-        // shader.setFloat("offset",0.5f);
-
         // Draw
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
