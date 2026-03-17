@@ -42,8 +42,6 @@ int main()
     1, 2, 3  // second triangle
     };
 
-
-
     // PROCESS OF GENERATING A TEXTURE
     unsigned int texture1;
     glGenTextures(1, &texture1);
@@ -51,10 +49,10 @@ int main()
 
     
     // set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     // load and generate the texture
     int width, height, nrChannels;
     unsigned char *data = stbi_load("data/textures/container.jpg", &width, &height, &nrChannels, 0);
@@ -72,12 +70,19 @@ int main()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
 
+    
+
     stbi_image_free(data);
 
 
     unsigned int texture2;
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     stbi_set_flip_vertically_on_load(true);
     unsigned char *data2 = stbi_load("data/textures/awesomeface.png", &width, &height, &nrChannels, 0);
@@ -137,9 +142,16 @@ int main()
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
     std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
+    float currentOpacity = 1.0f;
+
+
+
     shader.use();
     glUniform1i(glGetUniformLocation(shader.ID, "texture1"), 0);
     shader.setInt("texture2", 1);
+
+    
+   
 
     while (!glfwWindowShouldClose(window))
     {
@@ -153,7 +165,17 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        {
+            if (currentOpacity > 0.0f)
+            {
+                currentOpacity -= 0.05f;
+            }
+        }
         shader.use();
+        glUniform1f(glGetUniformLocation(shader.ID, "Opacity"), currentOpacity);
+
+        
         glBindVertexArray(VAO1);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); 
  
