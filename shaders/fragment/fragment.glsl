@@ -14,5 +14,5 @@
             FragColor = (texture(texture3, TexCoord));
 
         else
-            FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5f);
+            FragColor = texture(texture2, TexCoord);
     }
