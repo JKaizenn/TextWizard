@@ -283,14 +283,39 @@ int main()
 
         glEnable(GL_DEPTH_TEST);
 
+
+        // Camera
+        glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+
+        // Camera Direction - What its pointing at
+        glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+
+        // Right Axis - Represents the postive x axis of the camera space 
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0);
+        glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+
+        // Up Axis - Points to the camera's positive y-axis
+        glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
+        // Look At Matix
+        // glm::mat4 view;
+        // view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
+        //                    glm::vec3(0.0f, 0.0f, 0.0f),
+        //                    glm::vec3(0.0f, 1.0f, 0.0f));
+
+                           
+        // Projection Matrix
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 
         // 3D
 
         // Create a view matrix
-        glm::mat4 view = glm::mat4(1.0f);
-        // Translating the scene in the reverse direction of where we want to move
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        const float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        glm::mat4 view;
+        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
         // Projection Matrix
         glm::mat4 projection;
