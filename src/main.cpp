@@ -2,7 +2,6 @@
 #include <glfw/glfw3.h>
 #include "shaders/shader.h"
 
-
 // GLM - OPENGL MATH
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,6 +18,15 @@ void processInput(GLFWwindow *window);
 // Window Constants
 const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+// Setup Camera Vectors
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
+
+// Delta Time
+float deltaTime = 0.0f; // Time Between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
 
 int main() 
 {
@@ -262,6 +270,35 @@ int main()
     */
 
 
+    // Typical Camera Setup:
+    // Camera
+    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+
+    // Camera Direction - What its pointing at
+    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+
+    // Right Axis - Represents the postive x axis of the camera space 
+    // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0);
+    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+
+    // Up Axis - Points to the camera's positive y-axis
+    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
+
+    // Look At Matrix Example:
+    // glm::mat4 view;
+    // view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
+    //                    glm::vec3(0.0f, 0.0f, 0.0f),
+    //                    glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // View Matrix that rotates around the origin
+    // const float radius = 10.0f;
+    // float camX = sin(glfwGetTime()) * radius;
+    // float camZ = cos(glfwGetTime()) * radius;
+    // glm::mat4 view;
+    // view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
     // Render loop main window
     while (!glfwWindowShouldClose(window))
     {
@@ -283,26 +320,10 @@ int main()
 
         glEnable(GL_DEPTH_TEST);
 
-
-        // Camera
-        glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-
-        // Camera Direction - What its pointing at
-        glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-
-        // Right Axis - Represents the postive x axis of the camera space 
-        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0);
-        glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-
-        // Up Axis - Points to the camera's positive y-axis
-        glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-
-        // Look At Matix
-        // glm::mat4 view;
-        // view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
-        //                    glm::vec3(0.0f, 0.0f, 0.0f),
-        //                    glm::vec3(0.0f, 1.0f, 0.0f));
+        // Calculate New Delta time
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
                            
         // Projection Matrix
@@ -310,12 +331,11 @@ int main()
 
         // 3D
 
-        // Create a view matrix
-        const float radius = 10.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
+        // Create a view matrix / Camera
         glm::mat4 view;
-        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
+        // Look At View Matrix
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
         // Projection Matrix
         glm::mat4 projection;
@@ -333,7 +353,7 @@ int main()
 
         glBindVertexArray(VAO);
         // To render both triangles, use a uniform
-        shader.setInt("currentTexture", 1);
+        shader.setInt("currentTexture", 0);
         for (unsigned int i {0}; i < 10; i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
@@ -374,6 +394,17 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    // Camera Movement
+    const float cameraSpeed = 10.5f * deltaTime; // adjust accordingly
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
