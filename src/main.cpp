@@ -34,6 +34,14 @@ bool firstMouse = true;
 float deltaTime = 0.0f; // Time Between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
+
+// Color - Coral
+glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+glm::vec3 toyColor(1.0f, 0.5f, 0.31f);
+glm::vec3 result = lightColor * toyColor;
+
+
+
 int main() 
 {
     // Initialize GLFW and configure window hints
@@ -121,8 +129,7 @@ int main()
      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-    
+};    
 
     unsigned int indices[] = {  
     0, 1, 3, // first triangle
@@ -145,6 +152,7 @@ int main()
 };
 
     unsigned int VBO, VAO, EBO;
+    unsigned int lightVBO, lightVAO, lightEBO;
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -153,6 +161,27 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
+    // For light object
+    glGenVertexArrays(1, &lightVAO);
+    glGenBuffers(1, &lightVBO);
+    glGenBuffers(1, &lightEBO);
+
+    glBindVertexArray(lightVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -209,10 +238,10 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Load image, create texture and generate mipmaps
-    unsigned char *data2 = stbi_load("data/textures/minecraft-grass.png", &width, &height, &nrChannels, 0);
+    unsigned char *data2 = stbi_load("data/textures/sun.png", &width, &height, &nrChannels, 0);
     if (data2)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -236,7 +265,7 @@ int main()
 
     // Load image, create texture, and generate mipmaps
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    unsigned char *data3 = stbi_load("data/textures/Terry-Davis.png", &width, &height, &nrChannels, 0);
+    unsigned char *data3 = stbi_load("data/textures/minecraft-grass.png", &width, &height, &nrChannels, 0);
     if (data3)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data3);
@@ -346,6 +375,7 @@ int main()
 
         // camera/view transformation
         glm::mat4 view = camera.GetViewMatrix();
+
         shader.setMat4("view", view);
 
         // int modelLoc = glGetUniformLocation(shader.ID, "model");
@@ -359,7 +389,7 @@ int main()
 
         glBindVertexArray(VAO);
         // To render both triangles, use a uniform
-        shader.setInt("currentTexture", 0);
+        shader.setInt("currentTexture", 1);
         for (unsigned int i {0}; i < 10; i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
@@ -410,8 +440,6 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
-
-
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -452,3 +480,34 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 
+// Custom implementation of the LookAt function
+glm::mat4 calculate_lookAt_matrix(glm::vec3 position, glm::vec3 target, glm::vec3 worldUp)
+{
+    // 1. Position = known
+    // 2. Calculate cameraDirection
+    glm::vec3 zaxis = glm::normalize(position - target);
+    // 3. Get positive right axis vector
+    glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(worldUp), zaxis));
+    // 4. Calculate camera up vector
+    glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+
+    // Create translation and rotation matrix
+    // In glm we access elements as mat[col][row] due to column-major layout
+    glm::mat4 translation = glm::mat4(1.0f); // Identity matrix by default
+    translation[3][0] = -position.x; // Fourth column, first row
+    translation[3][1] = -position.y;
+    translation[3][2] = -position.z;
+    glm::mat4 rotation = glm::mat4(1.0f);
+    rotation[0][0] = xaxis.x; // First column, first row
+    rotation[1][0] = xaxis.y;
+    rotation[2][0] = xaxis.z;
+    rotation[0][1] = yaxis.x; // First column, second row
+    rotation[1][1] = yaxis.y;
+    rotation[2][1] = yaxis.z;
+    rotation[0][2] = zaxis.x; // First column, third row
+    rotation[1][2] = zaxis.y;
+    rotation[2][2] = zaxis.z; 
+
+    // Return lookAt matrix as combination of translation and rotation matrix
+    return rotation * translation; // Remember to read from right to left (first translation then rotation)
+}
