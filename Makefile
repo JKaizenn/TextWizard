@@ -7,12 +7,10 @@ SRCS = $(wildcard src/*.cpp)
 OBJS = $(SRCS:src/%.cpp=bin/%.o)
 GLAD_OBJ = bin/glad.o
 
-LIBS = -Llib \
-       -lglfw3 \
-       -framework OpenGL \
-       -framework Cocoa \
-       -framework IOKit \
-       -framework CoreVideo
+LIBS = -lglfw \
+       -lGL \
+       -ldl \
+       -lpthread
 
 bin/main: $(OBJS) $(GLAD_OBJ)
 	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
