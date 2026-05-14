@@ -30,7 +30,7 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.0f;
+float deltaTime = 0.0f;	
 float lastFrame = 0.0f;
 
 // lighting
@@ -44,6 +44,10 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
     // glfw window creation
     // --------------------
@@ -77,9 +81,9 @@ int main()
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightingShader("shaders/vertex/vertex.glsl", "shaders/fragment/fragment.glsl");
-    Shader lightCubeShader("shaders/vertex/light_vertex.glsl","fragment.glsl");
+    Shader lightCubeShader("shaders/vertex/light_vertex.glsl","shaders/fragment/light_fragment.glsl");
 
-       // set up vertex data (and buffer(s)) and configure vertex attributes
+    // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
